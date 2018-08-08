@@ -20,12 +20,12 @@
 
 ![image](https://github.com/Kano-Wu/WubiQuery/blob/master/docs/page3.png)
 
-四个字的词语？
+四个字的成语？
 
 ![image](https://github.com/Kano-Wu/WubiQuery/blob/master/docs/page4.png)
 
 甚至更多字？
 
-![image](https://github.com/Kano-Wu/WubiQuery/blob/master/docs/page5.png)
+![image](https://github.com/Kano-Wu/WubiQuery/blob/master/docs/pageX.png)
 
 统统满足你！
