@@ -6,7 +6,7 @@
     // 插件的版本
     "version": "1.0.0",
     // 插件描述
-    "description": "简单的Chrome扩展demo",
+    "description": "五笔编码查询",
     // 图标，一般偷懒全部用一个尺寸的也没问题
     "icons":
     {
@@ -26,7 +26,7 @@
     {
         "default_icon": "images/icon.png",
         // 图标悬停时的标题，可选
-        "default_title": "五笔查询",
+        "default_title": "五笔编码查询",
         "default_popup": "popup.html"
     }
 }
