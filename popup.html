@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="css/styles.css">
+	<script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+	<script type="text/javascript" src="js/hanzi_wubi.js"></script>
+	<script type="text/javascript" src="js/process.js"></script>
+</head>
+<body>
+	<div class="container">
+		<h1>五笔君 ٩(๑❛ᴗ❛๑)۶</h1>
+		<div class="input-part">
+			<input id="input_hanzi" type="text" name="hanzi" />
+			<img id="refresh" class="img-icon" src="images/refresh.png">
+		</div>
+		<div id="show_tip" class="show-tip">
+			出错啦~输入不合法哦！
+		</div>
+		<div id="show_part" class="show-part">
+			<table>
+				<tr>
+					<td>汉字：<span id="show_hanzi"></span></td>
+				</tr>
+				<tr>
+					<td>五笔编码：<span id="show_wubi_code"></span></td>
+				</tr>
+				<tr>
+					<td>
+						<img id="show_wubi_img" src='images/nopic.jpg'>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</body>
+</html>
