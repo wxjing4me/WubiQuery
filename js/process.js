@@ -82,11 +82,15 @@ function getWubiImg(hanzi) {
 		let img = getWubiImgSrc(hanzi[hanzi.length-1]);
 		$('#show_wubi_imgs').append(img);
 	}
+	/* 图片事件绑定 */
+	$('img').bind('error', function(){
+		 $(this).attr('src', DefaultImgSrc);
+	});
 }
 
 /* 汉字的拆分图-路径 */
 function getWubiImgSrc(hanzi) {
-	let src = "<img src='gifs/" + hanzi + ".gif' onerror='ifImgNotFound(this)'>";
+	let src = "<img src='gifs/" + hanzi + ".gif'>";
 	return src;
 }
 
@@ -113,6 +117,8 @@ function testWubi() {
 $(function(){
 
 	clearWubi();
+
+	$("#input_hanzi").focus();
 
 	/* 刷新按钮 点击事件 */
 	$('#refresh').click(function(){
@@ -147,9 +153,8 @@ $(function(){
 	});
 
 	/* TODO：清除快捷键（Ctrl+Enter）触发事件 */
+
+	
+
 });
 
-/* 图片不存在 */
-function ifImgNotFound(that) {
-	$(that).attr('src', 'images/nopic.jpg'); 
-}
