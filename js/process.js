@@ -1,6 +1,9 @@
 let InputErrorMsg = '请输入中文汉字~'
 let RecommendMsg = '多个字的五笔编码仅供参考'
 let DefaultImgSrc = 'images/nopic.jpg'
+let DefaultHanziNotFoundMsg = ' 字暂未收录，请重新输入~'
+let noLetterReg = /^[a-zA-Z]+/;
+let letterReg = /[a-zA-Z]/g;
 
 /* 隐藏五笔框 */
 function clearWubi() {
@@ -13,12 +16,16 @@ function clearWubi() {
 
 /* 显示五笔框 */
 function showWubi(hanzi) {
-	let wubi_code = getWubi(hanzi);
+	let wubi_code = getWubiCodes(hanzi);
 	let wubi_img = 'gifs/'+hanzi+'.gif';
-	$('#show_hanzi').html(hanzi);
-	$('#show_wubi_code').html(wubi_code);
-	getWubiImg(hanzi);
-	$('#show_part').show();
+	if (wubi_code != '') {
+		$('#show_hanzi').html(hanzi);
+		$('#show_wubi_code').html(wubi_code);
+		getWubiImg(hanzi);
+		$('#show_part').show();
+	} else {
+		/* 有汉字未收录 */
+	}
 }
 
 /* 显示错误提示 */
@@ -27,37 +34,84 @@ function showError(msg) {
 	$('#show_tip').show();
 }
 
-/* 获取汉字的五笔编码 */
-function getWubi(hanzi) {
+/* 汉字不存在的报错信息 */
+function hanziNotFoundMsg(string) {
+	string = string.replace(letterReg, '');
+	let hanzi_str = Array.from(new Set(string.split(''))).join('、');
+	return hanzi_str + DefaultHanziNotFoundMsg;
+}
+
+/* 判断汉字是否收录
+ * 若有收录，则返回该字的五笔编码
+ * 若无，则返回该字
+ */
+function getWubiCode(hanzi) {
+	let hanzi_wubi_code = Hanzi_Wubi[hanzi];
+	if (typeof(hanzi_wubi_code) == "undefined") {
+	    return hanzi;
+	} else {
+		return hanzi_wubi_code;
+	}
+}
+
+/* 获取汉字的五笔编码-Main
+ * return wubi_code = '' 表示其中有汉字未收录
+ */
+function getWubiCodes(hanzi) {
 	let wubi_code = '';
 	switch(hanzi.length) {
 		case 0: 
 			wubi_code = '';
 		case 1:
-			wubi_code = Hanzi_Wubi[hanzi];
+			let wubi_code0 = getWubiCode(hanzi);
+			if (letterReg.test(wubi_code0)) {
+				wubi_code = wubi_code0
+			} else {
+				let string = wubi_code0;
+				showError(hanziNotFoundMsg(string));
+				wubi_code = '';
+			}
 			break;
 		case 2: {
-			let wubi_code0 = Hanzi_Wubi[hanzi[0]];
-			let wubi_code1 = Hanzi_Wubi[hanzi[1]];
-			wubi_code = wubi_code0.substr(0, 2) + wubi_code1.substr(0, 2);
-			showError(RecommendMsg);
+			let wubi_code0 = getWubiCode(hanzi[0]);
+			let wubi_code1 = getWubiCode(hanzi[1]);
+			if (letterReg.test(wubi_code0) && letterReg.test(wubi_code1)) {
+				wubi_code = wubi_code0.substr(0, 2) + wubi_code1.substr(0, 2);
+				showError(RecommendMsg);
+			} else {
+				let string = wubi_code0 + wubi_code1;
+				showError(hanziNotFoundMsg(string));
+				wubi_code = '';
+			}
 			break;
 		}
 		case 3: {
-			let wubi_code0 = Hanzi_Wubi[hanzi[0]];
-			let wubi_code1 = Hanzi_Wubi[hanzi[1]];
-			let wubi_code2 = Hanzi_Wubi[hanzi[2]];
-			wubi_code = wubi_code0.substr(0, 1) + wubi_code1.substr(0, 1) + wubi_code2.substr(0, 2);
-			showError(RecommendMsg);
+			let wubi_code0 = getWubiCode(hanzi[0]);
+			let wubi_code1 = getWubiCode(hanzi[1]);
+			let wubi_code2 = getWubiCode(hanzi[2]);
+			if (letterReg.test(wubi_code0) && letterReg.test(wubi_code1) &&letterReg.test(wubi_code2)) {
+				wubi_code = wubi_code0.substr(0, 1) + wubi_code1.substr(0, 1) + wubi_code2.substr(0, 2);
+				showError(RecommendMsg);
+			} else {
+				let string = wubi_code0 + wubi_code1 + wubi_code2;
+				showError(hanziNotFoundMsg(string));
+				wubi_code = '';
+			}
 			break;
 		}
 		default: {
-			let wubi_code0 = Hanzi_Wubi[hanzi[0]];
-			let wubi_code1 = Hanzi_Wubi[hanzi[1]];
-			let wubi_code2 = Hanzi_Wubi[hanzi[2]];
-			let wubi_codeX = Hanzi_Wubi[hanzi[hanzi.length-1]];
-			wubi_code = wubi_code0.substr(0, 1) + wubi_code1.substr(0, 1) + wubi_code2.substr(0, 1) + wubi_codeX.substr(0, 1);
-			showError(RecommendMsg);
+			let wubi_code0 = getWubiCode(hanzi[0]);
+			let wubi_code1 = getWubiCode(hanzi[1]);
+			let wubi_code2 = getWubiCode(hanzi[2]);
+			let wubi_codeX = getWubiCode(hanzi[hanzi.length-1]);
+			if (letterReg.test(wubi_code0) && letterReg.test(wubi_code1) &&letterReg.test(wubi_code2) && letterReg.test(wubi_codeX)) {
+				wubi_code = wubi_code0.substr(0, 1) + wubi_code1.substr(0, 1) + wubi_code2.substr(0, 1) + wubi_codeX.substr(0, 1);
+				showError(RecommendMsg);
+			} else {
+				let string = wubi_code0 + wubi_code1 + wubi_code2 + wubi_codeX;
+				showError(hanziNotFoundMsg(string));
+				wubi_code = '';
+			}
 			break;
 		}
 	}
@@ -151,10 +205,6 @@ $(function(){
 			}
 	    } 
 	});
-
-	/* TODO：清除快捷键（Ctrl+Enter）触发事件 */
-
-	
 
 });
 
