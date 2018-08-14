@@ -103,8 +103,104 @@ def wubi_crawler_cidianwang():
             continue
 
 
+#---------------------------
+# 爬取图片，记录图片url地址
+#---------------------------
+def wubi_image_crawler():
+
+    url_52wubi = 'http://www.52wubi.com/wbbmcx/tp/'
+    url_cidianwang = 'http://www.cidianwang.com/file/wubi/'
+    
+    hanziFilePath = 'hanzi_wubi.txt'
+
+    def readHanziFile(file_path):
+        hanziList = []
+        with open(file_path, 'r') as f:
+            for line in f.readlines():
+                hanzi = line.strip().split('"')[1]
+                hanziList.append(hanzi)
+        return hanziList
+
+    hanziList = readHanziFile(hanziFilePath)
+
+    wf = open('hanzi_imgurl.txt', 'w')
+
+    for i in range(2132, len(hanziList)):
+
+        hanzi = hanziList[i]
+
+        print i, '/',  len(hanziList)
+
+        ## get image from 52wubi
+        wubi_img_src = url_52wubi + hanzi + '.gif'
+        wubi_img = requests.get(wubi_img_src).content
+
+        if wubi_img[:6] != '<html>':
+            wf.write(hanzi + '::' + wubi_img_src + '\n')
+        else:
+            ## get image from cidianwang
+            wubi_img_src = url_cidianwang + hanzi + '.gif'
+            wubi_img = requests.get(wubi_img_src).content
+
+            if wubi_img[-1] != '>':
+                wf.write(hanzi + '::' + wubi_img_src + '\n')
+            else:
+                wf.write(hanzi + '::' + '\n')  
+
+    wf.close()
+
+
+#---------------------------
+# 整理成js的字典格式
+#---------------------------
+def build_json():
+    hanzi_wubi_file = 'hanzi_wubi2.txt'
+    hanzi_imgurl_file = 'hanzi_imgurl.txt'
+    json_file = 'hanzi_wubi2.js'
+
+    hanziDict = {}
+    hanziList = []
+    
+    with open(hanzi_wubi_file, 'r') as f:
+        for line in f.readlines():
+            string = line.strip().split('-')
+            hanzi = string[0]
+            wubi = string[1]
+            hanzis = {}
+            if len(wubi) != 0:
+                hanzis["wubi_code"] = wubi
+            hanziDict[hanzi] = hanzis
+            hanziList.append(hanzi)
+
+    print len(hanziDict)
+
+    with open(hanzi_imgurl_file, 'r') as f:
+        for line in f.readlines():
+            string = line.strip().split('-')
+            hanzi = string[0]
+            img_url = string[1]
+            hanzis = {}
+            if len(img_url) != 0:
+                hanziDict[hanzi]["wubi_img_url"] = img_url
+
+    with open(json_file, 'w') as f:
+        f.write('var Hanzi_Wubi = {' + '\n')
+        for hanzi in hanziList:
+            value = hanziDict[hanzi]
+            content = '\t"' + hanzi + '"' + ": {\n"
+            if value.has_key("wubi_code"):
+                content += '\t\t"wubi_code": "' + value["wubi_code"] + '",\n'
+            if value.has_key("wubi_img_url"):
+                content += '\t\t"wubi_img_url": "' + value["wubi_img_url"] + '",\n'
+
+            content += '\t\t},\n'
+            f.write(content)
+
+        f.write('}')
+
+
 if __name__ == '__main__':
-    wubi_crawler_cidianwang()
+    build_json()
 
 
 
