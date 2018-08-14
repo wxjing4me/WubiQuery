@@ -5,11 +5,13 @@ let DefaultHanziNotFoundMsg = ' 字暂未收录，请重新输入~'
 let noLetterReg = /^[a-zA-Z]+/;
 let letterReg = /[a-zA-Z]/g;
 
+
 /* 隐藏五笔框 */
 function clearWubi() {
 	$('#show_hanzi').val('');
 	$('#show_wubi_code').val('');
 	$('#show_wubi_imgs').html('');
+	$('#show_wubi_explain').html('');
 	$('#show_part').hide();
 	$('#show_tip').hide();
 }
@@ -46,15 +48,33 @@ function hanziNotFoundMsg(string) {
  * 若无，则返回该字
  */
 function getWubiCode(hanzi) {
-	let hanzi_wubi_code = Hanzi_Wubi[hanzi];
-	if (typeof(hanzi_wubi_code) == "undefined") {
+	let wubi_data = Hanzi_Wubi[hanzi];
+	if (typeof(wubi_data) == "undefined") {
 	    return hanzi;
 	} else {
-		return hanzi_wubi_code;
+		return wubi_data.wubi_code;
 	}
 }
 
-/* 获取汉字的五笔编码-Main
+/*
+ * 判断汉字是否有注解
+ * 前提：汉字已收录
+ */
+function getWubiExplain(hanzi) {
+	let wubi_explain = Hanzi_Wubi[hanzi].wubi_explain;
+	if (typeof(wubi_explain) != "undefined") {
+		showExplain(wubi_explain);
+	}
+}
+
+/* 显示注解 */
+function showExplain(explain) {
+	let explainStr = '<span style="font-weight: bold;">注解：</span>'+ explain ;
+	$('#show_wubi_explain').html(explainStr);
+}
+
+/* 
+ * 获取汉字的五笔编码-Main
  * return wubi_code = '' 表示其中有汉字未收录
  */
 function getWubiCodes(hanzi) {
@@ -65,7 +85,8 @@ function getWubiCodes(hanzi) {
 		case 1:
 			let wubi_code0 = getWubiCode(hanzi);
 			if (letterReg.test(wubi_code0)) {
-				wubi_code = wubi_code0
+				wubi_code = wubi_code0;
+				getWubiExplain(hanzi);
 			} else {
 				let string = wubi_code0;
 				showError(hanziNotFoundMsg(string));
@@ -80,6 +101,7 @@ function getWubiCodes(hanzi) {
 				showError(RecommendMsg);
 			} else {
 				let string = wubi_code0 + wubi_code1;
+				console.log('case 2 - test false : ' + string);
 				showError(hanziNotFoundMsg(string));
 				wubi_code = '';
 			}
@@ -152,10 +174,10 @@ function getWubiImgSrc(hanzi) {
  * 除了汉字外的字都去掉
  */
 function checkInput(str) {
-	console.log('before: ' + str);
+	console.log('checkInput before: ' + str);
 	let reg = /[^\u4e00-\u9fa5]/g;
 	str = str.replace(reg, '');
-	console.log('after : ' + str);
+	console.log('checkInput after : ' + str);
 	return str;
 }
 
